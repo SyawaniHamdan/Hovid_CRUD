@@ -24,12 +24,13 @@ DROP PROC selectUser
 END
 GO 
 CREATE PROCEDURE selectUser
-	@UserID INT 
+	 
 AS  
 BEGIN  
 
     SELECT UserID, UserName, UserNo, CreateDate
-    FROM   tbUser  
+    FROM   tbUser
+    ORDER BY UserName ASC
 
 END  
 GO

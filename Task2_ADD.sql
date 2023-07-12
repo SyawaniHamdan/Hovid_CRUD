@@ -18,19 +18,28 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-IF OBJECT_ID('selectUser') IS NOT NULL  
+IF OBJECT_ID('addUser') IS NOT NULL  
 BEGIN  
-DROP PROC selectUser  
+DROP PROC addUser  
 END
 GO 
-CREATE PROCEDURE selectUser
-	@UserID INT 
+CREATE PROCEDURE addUser
+	@UserName   VARCHAR(20),
+	@UserNo     INT
+ 
 AS  
 BEGIN  
+INSERT INTO tbUser (UserName, UserNo)  
+VALUES (@UserName, @UserNo)  
 
-    SELECT UserID, UserName, UserNo, CreateDate
-    FROM   tbUser  
-    WHERE  (UserID = @UserID)  
+DECLARE 
+	@UserID INT,
+	@CreateDate DATETIME
 
-END  
-GO
+SET @UserID = SCOPE_IDENTITY()
+SET @CreateDate = GetDate()
+  
+SELECT  UserName = @UserName,  UserNo = @UserNo
+FROM tbUser  
+WHERE UserID = @UserID  
+END 

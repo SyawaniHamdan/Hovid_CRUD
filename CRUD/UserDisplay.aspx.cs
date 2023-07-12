@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.Net.NetworkInformation;
 using System.Web.Configuration;
 using System.Web.UI.WebControls;
@@ -32,7 +33,8 @@ namespace CRUD
         {
             connect();
             con.Open();
-            SqlCommand cmd = new SqlCommand("select * from tbUser", con);
+            SqlCommand cmd = new SqlCommand("selectUser", con);
+            cmd.CommandType = CommandType.StoredProcedure;
             SqlDataAdapter sd = new SqlDataAdapter(cmd);
             DataTable dt = new DataTable();
             sd.Fill(dt);
@@ -65,6 +67,7 @@ namespace CRUD
 
         protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
         {
+            backupDB();
             int index = Convert.ToInt32(e.RowIndex);
             DataTable dt = ViewState["dt"] as DataTable;
             string userID = "";
@@ -122,7 +125,7 @@ namespace CRUD
             //int userId = Convert.ToInt32(GridView.DataKeys[e.RowIndex].Values[0]);
             //string username = (row.FindControl("txtUserName") as TextBox).Text;
             //int userNo = Convert.ToInt32(row.FindControl("txtUserNo") as TextBox);
-
+            backupDB();
             int index = Convert.ToInt32(e.RowIndex);
             DataTable dt = ViewState["dt"] as DataTable;
             string userID = "";
@@ -164,6 +167,30 @@ namespace CRUD
             displayUser();
             GridView.EditIndex = -1;
             displayUser();
+        }
+
+        public void backupDB()
+        {
+            string backupDIR = "C:\\BackupDB";
+            if (!System.IO.Directory.Exists(backupDIR))
+            {
+                System.IO.Directory.CreateDirectory(backupDIR);
+            }
+            try
+            {
+                connect();
+                SqlCommand cmd = new SqlCommand("backup database master to disk='" + backupDIR + "\\" + DateTime.Now.ToString("ddMMyyyy_HHmmss") + ".Bak'", con);
+                cmd.Connection = con;
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+                
+                Response.Write("Error Occured During DB backup process" + ex.ToString());
+                con.Close();
+            }
         }
     }
 }
